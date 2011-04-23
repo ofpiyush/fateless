@@ -24,13 +24,21 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-	$config = array
-		( 
-			'server'		=> 'chat.freenode.net',
-			'port'			=> 6667,
-			'channels'		=> array(),
-			'name'			=> '',
-			'nick'			=> '',
-			'pass'			=> null,
-			'readLength'	=> 512
-		);
+$config = array
+	( 
+		'server'		=> 'chat.freenode.net',
+		'port'			=> 6667,
+		'channels'		=> array(),
+		'name'			=> '',
+		'nick'			=> '',
+		'pass'			=> null,
+		'readLength'	=> 512,
+		'logsDir'		=> 'logs'
+	);
+$lazyPaths = array
+	(
+		FATELESS_BASEPATH.'core/',
+		FATELESS_BASEPATH.'commands/',		
+	);
+$admins = array();
+$masters = array();

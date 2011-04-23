@@ -26,16 +26,17 @@
  */
 class config
 {
-	private $conf = array();
+	private static $conf = array();
 	function __construct($array)
 	{
 		//load default values
-		$this->conf = $array;
+		self::$conf = $array;
+		unset($array);
 	}
 	public function __get($key)
 	{
-		if(array_key_exists($key,$this->conf))
-			return $this->conf[$key];
+		if(array_key_exists($key,self::$conf))
+			return self::$conf[$key];
 		return false;
 	}
 	public function __set($key,$val)
@@ -43,21 +44,21 @@ class config
 		if($key == 'channels')
 			$this->updateChannels($key,$val);
 		else
-			$this->conf[$key] = $value;	
+			self::$conf[$key] = $value;	
 	}
 	private function updateChannels($channel,$delete=false)
 	{
-		$channels = array_flip($this->conf['channels']);
+		$channels = array_flip(self::$conf['channels']);
 		if(array_key_exists($channel,$channels) && $delete)
 		{
 			if($delete)	
 			{
 				unset($channels[$channel]);
-				$this->conf['channels'] = array_flip($channels);
+				self::$conf['channels'] = array_flip($channels);
 			}
 		}
 		else
-			$this->conf['channels'][]=$channel;
+			self::$conf['channels'][]=$channel;
 		unset($channels);
 	}
 }

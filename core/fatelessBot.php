@@ -30,14 +30,14 @@ class fatelessBot {
 	private $commands	= array();
 	private $actions	= array();
 	private $masters	= array();
-	private function __construct($config,$logger)
+	public function __construct($config,$logger)
 	{
 		$this->config	= $config;
 		$this->log		= $logger;
 	}
-	public function addMaster($nick,$user)
+	public function addMaster($user)
 	{
-		$this->masters[$nick]=$user;
+		$this->masters[]=$user;
 	}
 	public function loop()
 	{
@@ -83,6 +83,5 @@ class fatelessBot {
 	private function send($cmd) 
 	{
 		fputs($this->socket, $cmd."\r\n");
-		$this->log->command($cmd);
 	}
 }

@@ -26,9 +26,27 @@
  */
 class logger
 {
-	private $dir;
-	function __construct()
+	private static $dir;
+	
+	function __construct($dir)
 	{
-		$this->dir = realpath(FATE_BASE'logs');
+		self::$dir = rtrim(realpath(FATELESS_BASEPATH.$dir),'/').'/';
+		if(self::$dir == '/')
+			throw new Exception("Logs directory not present");
+		
+	}
+	function line($msg, $where ='general')
+	{
+		$fp = fopen(self::$dir.$where,'a');
+		fwrite($msg,$fp);
+		fclose($fp);
+		unset($fp);
+	}
+	function error($msg)
+	{
+		$fp = fopen(self::$dir.'errors','a');
+		fwrite('[ '.microtime(true).'] '.$msg,$fp);
+		fclose($fp);
+		unset($fp);
 	}
 }
