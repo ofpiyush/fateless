@@ -30,15 +30,13 @@ class fatelessBot {
 	private $commands	= array();
 	private $actions	= array();
 	private $masters	= array();
+	private $admins	= array();
 	public function __construct($config,$logger)
 	{
 		$this->config	= $config;
 		$this->log		= $logger;
 	}
-	public function addMaster($user)
-	{
-		$this->masters[]=$user;
-	}
+	
 	public function loop()
 	{
 		while(1)
@@ -48,7 +46,7 @@ class fatelessBot {
 	}
 	public function connect()
 	{
-		$this->socket	= fsockopen($this->config->server, $this->config->port);
+		$this->socket = fsockopen($this->config->server, $this->config->port);
 		$this->send(
 			'USER '. $this->config->nick.' piyushmishra.com '.
 			$this->config->nick.' : '.$this->config->name
@@ -67,6 +65,14 @@ class fatelessBot {
 			$this->privmsg('nickserv',' identify '.$this->config->pass);
 			sleep(10);
 		}
+	}
+	public function addMaster($nick,$user)
+	{
+		$this->masters[$nick] = $user;
+	}
+	private function addAdmin($nick,$user)
+	{
+		$this->admins[$nick] = $user;
 	}
 	private function privmsg($to, $msg)
 	{
