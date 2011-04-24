@@ -36,6 +36,10 @@ class logger
 			throw new Exception("Logs directory not present");
 		
 	}
+	function error($msg)
+	{
+		$this->line($msg,'errors');
+	}
 	function line($msg, $where ='general')
 	{
 		$fp = fopen(self::$dir.$where,'a');
@@ -43,9 +47,4 @@ class logger
 		fclose($fp);
 		unset($fp);
 	}
-	function error($msg)
-	{
-		$this->line($msg,'errors');
-	}
-	
 }
