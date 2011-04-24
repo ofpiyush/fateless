@@ -39,7 +39,7 @@ class logger
 	function line($msg, $where ='general')
 	{
 		$fp = fopen(self::$dir.$where,'a');
-		fwrite($msg,$fp);
+		fwrite('[ '.microtime(true).'] '.$msg,$fp);
 		fclose($fp);
 		unset($fp);
 	}

@@ -63,7 +63,7 @@ class fatelessBot {
 	{
 		if(!is_null($this->config->pass))
 		{
-			$this->privmsg('nickserv',' identify '.$this->config->pass);
+			$this->privmsg('NickServ',' identify '.$this->config->pass);
 			sleep(10);
 		}
 	}
