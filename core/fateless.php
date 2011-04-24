@@ -1,4 +1,5 @@
 <?php
+if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
 /**
  * fateless
  * Copyright (C) 2010-2011  Piyush Mishra
