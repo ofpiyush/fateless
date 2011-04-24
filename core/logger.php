@@ -39,15 +39,13 @@ class logger
 	function line($msg, $where ='general')
 	{
 		$fp = fopen(self::$dir.$where,'a');
-		fwrite('[ '.microtime(true).'] '.$msg,$fp);
+		fwrite('[ '.microtime(true).'] '.$msg."\r\n",$fp);
 		fclose($fp);
 		unset($fp);
 	}
 	function error($msg)
 	{
-		$fp = fopen(self::$dir.'errors','a');
-		fwrite('[ '.microtime(true).'] '.$msg,$fp);
-		fclose($fp);
-		unset($fp);
+		$this->line($msg,'errors');
 	}
+	
 }
