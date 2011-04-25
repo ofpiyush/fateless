@@ -45,14 +45,12 @@ final class fateless
 	}
 	public static function handleRequest()
 	{
-		$return= true;
 		$request = new request(self::$bot->read());
-		if(is_array($request->cmds) && count($request->cmds) > 0)
+		if(!is_null($request->cmd))
 		{
-			foreach($request->cmds as $command)
-				$return = $return && self::resolver->getCommand($command)->process($request, self::$bot);
+			return self::resolver->getCommand($request->cmd)->process($request, self::$bot);
 		}
-		return $return;
+		return true;
 	}
 	public static function autoload($class)
 	{

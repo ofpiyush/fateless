@@ -39,7 +39,7 @@ class commandResolver
 	{
 		if(array_key_exists($classname,$this->instances))
 			return $this->instances[$classname];
-		if(fateless::autoload($classname,'commands'))
+		if(fateless::autoload($classname))
 		{
 			if(class_exists($classname))
 			{
@@ -49,11 +49,15 @@ class commandResolver
 					$this->instances[$classname] = $cmdClass->newInstance();
 					return $this->instances[$classname];
 				}
+			}
+			else
+			{
+				
+			}
 		}
+		elseif()
+			
 		else
-		{
-			$this->defaultCmd->context($classname);
 			return $this->defaultCmd;
-		}
 	}
 }

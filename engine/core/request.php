@@ -27,17 +27,38 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 class request
 {
-	var $author = false;
-	var $channel = false;
-	var $cmds = array();
+	var $author		= null;
+	var $channel	= null;
+	var $baseCmd	= null;
+	var $cmd		= null;
+	var $msg		= null;
+	var $raw		= null;
 	function __construct($string)
 	{
-		if($string)
-			$this->process($string);
+		$parts = explode(':',$string);
+		$this->raw['base'] = array_shift($parts);
+		if(is_array($parts))
+			$this->raw['msg'] = implode(':',$parts);
+		unset($string,$parts);
+		$this->processBase();
+		if(array_key_exists('msg',$this->raw) && $this->baseCmd == 'PRIVMSG')
+			$this->process($this->raw['msg']);
 	}
-	function process($string)
+	public function process($msg)
 	{
+		$parts = explode(" ",$msg);
+		//if()
+	}
+	private function processBase()
+	{
+		$parts = explode(" ",$this->raw['base']);
+		if($parts[0] = "PING")
+		{
+			$this->cmd = 'ping';
+			return ;
+		}
+		$sender = array_shift($parts);
+		
 		
 	}
-	
 }

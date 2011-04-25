@@ -28,5 +28,5 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 abstract class baseCommand
 {
 	final function __construct(){}
-	abstract function execute(request $request, botFateless $bot);
+	abstract function execute(request $request, fatelessBot $bot);
 }

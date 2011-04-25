@@ -28,9 +28,10 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 class defaultCommand extends baseCommand
 {
 	private $context;
-	function execute(request $request, botFateless $bot)
+	function execute(request $request, fatelessBot $bot)
 	{
-		
+		//Do nothing
+		return true;
 	}
 
 }

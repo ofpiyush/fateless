@@ -44,12 +44,11 @@ class fatelessBot {
 	public function read()
 	{
 		$read = fgets($this->socket, $this->config->readLength);
-		if(substr($read,0,4) =="PING")
-		{
-			$this->send(str_replace("PING","PONG",$read));
-			return false;
-		}
 		return ltrim($read,':');
+	}
+	public function write($cmd)
+	{
+		$this->send($cmd);
 	}
 	public function connect()
 	{
@@ -59,6 +58,10 @@ class fatelessBot {
 			$this->config->nick.' : '.$this->config->name
 			);
 		$this->send('NICK '. $this->config->nick);
+	}
+	public function disconect()
+	{
+		fclose($this->socket);
 	}
 	public function login()
 	{
@@ -80,6 +83,14 @@ class fatelessBot {
 	{
 		$this->admins[$nick] = $user;
 	}
+	public function isAdmin($nick,$user)
+	{
+		$this->isUser($nick,$user,'admins')
+	}
+	public function isMaster($nick,$user)
+	{
+		$this->isUser($nick,$user,'masters')
+	}
 	public function privmsg($to, $msg)
 	{
 		$this->send('PRIVMSG '.$to.' :'.$msg);
@@ -91,6 +102,10 @@ class fatelessBot {
 				$this->joinChannel($chan);
 		elseif(strlen($channels))
 			$this->joinChannel($channels);
+	}
+	private function isUser($nick,$user,$type)
+	{
+		return (array_key_exists($nick,$this->$type) && $this->$type[$nick] == $user);
 	}
 	private function send($cmd) 
 	{
