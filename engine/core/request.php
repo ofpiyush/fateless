@@ -1,4 +1,5 @@
 <?php
+if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 /**
  * fateless
  * Copyright (C) 2010-2011  Piyush Mishra
@@ -24,11 +25,19 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-
-//So the bot doesnt stop.
-$engineDir = "engine";
-define('FATELESS_BASEPATH',rtrim(realpath('.'),'/').'/');
-define('FATELESS_ENGINEPATH',rtrim(realpath(FATELESS_BASEPATH.$engineDir),'/').'/');
-if(FATELESS_ENGINEPATH=='/')
-	exit("Wrong engine path set!");
-require_once(FATELESS_ENGINEPATH.'init.php');
+class request
+{
+	var $author = false;
+	var $channel = false;
+	var $cmds = array();
+	function __construct($string)
+	{
+		if($string)
+			$this->process($string);
+	}
+	function process($string)
+	{
+		
+	}
+	
+}

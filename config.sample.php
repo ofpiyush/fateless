@@ -1,5 +1,5 @@
 <?php
-if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
+if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 /**
  * fateless
  * Copyright (C) 2010-2011  Piyush Mishra
@@ -35,11 +35,13 @@ $config = array
 		'pass'			=> null,
 		'readLength'	=> 512,
 		'logsDir'		=> 'logs'
+		'commandsDir'	=> 'commands'
 	);
 $lazyPaths = array
 	(
-		FATELESS_BASEPATH.'core/',
-		FATELESS_BASEPATH.'commands/',		
+		FATELESS_ENGINEPATH.'core/',
+		FATELESS_BASEPATH.$config['commandsDir'],
+		FATELESS_ENGINEPATH.'commands/'
 	);
 $admins = array();
 $masters = array();

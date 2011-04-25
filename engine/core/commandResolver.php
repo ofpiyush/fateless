@@ -1,4 +1,5 @@
 <?php
+if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 /**
  * fateless
  * Copyright (C) 2010-2011  Piyush Mishra
@@ -24,11 +25,35 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-
-//So the bot doesnt stop.
-$engineDir = "engine";
-define('FATELESS_BASEPATH',rtrim(realpath('.'),'/').'/');
-define('FATELESS_ENGINEPATH',rtrim(realpath(FATELESS_BASEPATH.$engineDir),'/').'/');
-if(FATELESS_ENGINEPATH=='/')
-	exit("Wrong engine path set!");
-require_once(FATELESS_ENGINEPATH.'init.php');
+class commandResolver
+{
+	private $baseCmd;
+	private $defaultCmd;
+	private $instances = array();
+	function __construct()
+	{
+		$this->baseCmd		= new ReflectionClass('baseCommand');
+		$this->defaultCmd	= new defaultCommand();
+	}
+	function getCommand($classname)
+	{
+		if(array_key_exists($classname,$this->instances))
+			return $this->instances[$classname];
+		if(fateless::autoload($classname,'commands'))
+		{
+			if(class_exists($classname))
+			{
+				$cmdClass = new ReflectionClass($classname);
+				if($cmdClass->isSubClassOf($this->baseCmd))
+				{
+					$this->instances[$classname] = $cmdClass->newInstance();
+					return $this->instances[$classname];
+				}
+		}
+		else
+		{
+			$this->defaultCmd->context($classname);
+			return $this->defaultCmd;
+		}
+	}
+}

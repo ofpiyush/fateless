@@ -1,4 +1,5 @@
 <?php
+if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 /**
  * fateless
  * Copyright (C) 2010-2011  Piyush Mishra
@@ -24,11 +25,28 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-
-//So the bot doesnt stop.
-$engineDir = "engine";
-define('FATELESS_BASEPATH',rtrim(realpath('.'),'/').'/');
-define('FATELESS_ENGINEPATH',rtrim(realpath(FATELESS_BASEPATH.$engineDir),'/').'/');
-if(FATELESS_ENGINEPATH=='/')
-	exit("Wrong engine path set!");
-require_once(FATELESS_ENGINEPATH.'init.php');
+class logger
+{
+	private static $dir = null;
+	function __construct()
+	{
+		if(self::$dir == '/')
+			throw new Exception("Logs directory not present");
+	}
+	public static setLogsDir($dir)
+	{
+		if(is_null(self::$dir))
+			self::$dir = rtrim(realpath(FATELESS_BASEPATH.$dir),'/').'/';
+	}
+	function error($msg)
+	{
+		$this->line($msg,'errors');
+	}
+	function line($msg, $where ='general')
+	{
+		$fp = fopen(self::$dir.$where,'a');
+		fwrite('[ '.microtime(true).'] '.$msg."\r\n",$fp);
+		fclose($fp);
+		unset($fp);
+	}
+}
