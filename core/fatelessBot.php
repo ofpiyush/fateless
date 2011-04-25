@@ -28,26 +28,28 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
 class fatelessBot {
 	private $socket;
 	private $config;
+	private $logger;
+	private $resolver;
 	private $commands	= array();
 	private $actions	= array();
 	private $masters	= array();
 	private $admins	= array();
-	public function __construct($config,$logger)
+	public function __construct($config)
 	{
 		$this->config	= $config;
-		$this->log		= $logger;
 		$this->connect();
 		$this->login();
 		$this->joinChannels($this->config->channels);
-		$this->loop();
 	}
-	
-	public function loop()
+	public function read()
 	{
-		while(1)
+		$read = fgets($this->socket, $this->config->readLength);
+		if(substr($read,0,4) =="PING")
 		{
-			$resolver = new commandResolver(fgets($this->socket, $this->config->readLength));
+			$this->send(str_replace("PING","PONG",$read));
+			return false;
 		}
+		return ltrim($read,':');
 	}
 	public function connect()
 	{
@@ -58,11 +60,6 @@ class fatelessBot {
 			);
 		$this->send('NICK '. $this->config->nick);
 	}
-	public function joinChannels($channels)
-	{
-		if(count($channels))
-			$this->joinChannel($channels);
-	}
 	public function login()
 	{
 		if(!is_null($this->config->pass))
@@ -71,25 +68,29 @@ class fatelessBot {
 			sleep(10);
 		}
 	}
+	public function joinChannel($channel)
+	{
+		$this->send('JOIN :'. $channel);
+	}
 	public function addMaster($nick,$user)
 	{
 		$this->masters[$nick] = $user;
 	}
-	private function addAdmin($nick,$user)
+	public function addAdmin($nick,$user)
 	{
 		$this->admins[$nick] = $user;
 	}
-	private function privmsg($to, $msg)
+	public function privmsg($to, $msg)
 	{
 		$this->send('PRIVMSG '.$to.' :'.$msg);
 	}
-	private function joinChannel($channel)
+	private function joinChannels($channels)
 	{
 		if(is_array($channel))
 			foreach($channel as $chan)
 				$this->joinChannel($chan);
-		else
-			$this->send('JOIN '. $channel);
+		elseif(strlen($channels))
+			$this->joinChannel($channels);
 	}
 	private function send($cmd) 
 	{

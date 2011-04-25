@@ -25,35 +25,19 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-class commandResolver
+class request
 {
-	private $baseCmd;
-	private $defaultCmd;
-	private $instances = array();
-	function __construct()
+	var $author = false;
+	var $channel = false;
+	var $cmds = array();
+	function __construct($string)
 	{
-		$this->baseCmd		= new ReflectionClass('baseCommand');
-		$this->defaultCmd	= new defaultCommand();
+		if($string)
+			$this->process($string);
 	}
-	function getCommand($classname)
+	function process($string)
 	{
-		if(array_key_exists($classname,$this->instances))
-			return $this->instances[$classname];
-		if(fateless::autoload($classname))
-		{
-			if(class_exists($classname))
-			{
-				$cmdClass = new ReflectionClass($classname);
-				if($cmdClass->isSubClassOf($this->baseCmd))
-				{
-					$this->instances[$classname] = $cmdClass->newInstance();
-					return $this->instances[$classname];
-				}
-		}
-		else
-		{
-			$this->defaultCmd->context($classname);
-			return $this->defaultCmd;
-		}
+		
 	}
+	
 }

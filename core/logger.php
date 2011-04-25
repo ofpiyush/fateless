@@ -27,14 +27,16 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
  */
 class logger
 {
-	private static $dir;
-	
-	function __construct($dir)
+	private static $dir = null;
+	function __construct()
 	{
-		self::$dir = rtrim(realpath(FATELESS_BASEPATH.$dir),'/').'/';
 		if(self::$dir == '/')
 			throw new Exception("Logs directory not present");
-		
+	}
+	public static setLogsDir($dir)
+	{
+		if(is_null(self::$dir))
+			self::$dir = rtrim(realpath(FATELESS_BASEPATH.$dir),'/').'/';
 	}
 	function error($msg)
 	{

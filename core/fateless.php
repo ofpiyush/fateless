@@ -28,7 +28,8 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
 final class fateless
 {
 	private static $lazyPaths = array();
-	
+	private static $resolver;
+	private static $bot;
 	private function __construct(){}
 	
 	public static function run()
@@ -36,20 +37,35 @@ final class fateless
 		require_once(FATELESS_BASEPATH.'config.php');
 		self::$lazyPaths = $lazyPaths;
 		spl_autoload_register(array(__CLASS__, 'autoload' ));
-		$bot = new fatelessBot(new config($config), new logger($config['logsDir']));
+		logger::setLogsDir($config['logsDir']);
+		self::$resolver	= new commandResolver();
+		self::$bot		= new fatelessBot(	new config($config)	);
 		unset($config,$lazyPaths);
+		do{/* nothing*/}while(self::handleRequest());
 	}
-	
+	public static function handleRequest()
+	{
+		$request = new request(self::$bot->read());
+		if(is_array($request->cmds))
+		{
+			$response = '';
+			foreach($request->cmds as $command)
+				$response.= ''.self::resolver->getCommand($command)->process($request, self::$bot);
+			if(strlen($response))
+				self::$bot->privmsg(($request->channel) ? $request->channel : $request->author, $response);			
+		}
+	}
 	public static function autoload($class)
 	{
 		if(class_exists($class))
-			return ;
+			return true;
 		foreach(self::$lazyPaths as $path)
 			if(file_exists($path.$class.'.php'))
 			{
 				require_once($path.$class.'.php');
 				return true;
 			}
+		return false;
 	}
 
 	public static function addLazyPath($path)

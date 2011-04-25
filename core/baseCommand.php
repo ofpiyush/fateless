@@ -27,6 +27,6 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
  */
 abstract class baseCommand
 {
-	
-	
+	final function __construct(){}
+	abstract function execute(request $request);
 }
