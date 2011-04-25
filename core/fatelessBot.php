@@ -36,13 +36,17 @@ class fatelessBot {
 	{
 		$this->config	= $config;
 		$this->log		= $logger;
+		$this->connect();
+		$this->login();
+		$this->joinChannels($this->config->channels);
+		$this->loop();
 	}
 	
 	public function loop()
 	{
 		while(1)
 		{
-			
+			$resolver = new commandResolver(fgets($this->socket, $this->config->readLength));
 		}
 	}
 	public function connect()
@@ -54,10 +58,10 @@ class fatelessBot {
 			);
 		$this->send('NICK '. $this->config->nick);
 	}
-	public function joinChannels()
+	public function joinChannels($channels)
 	{
-		if(count($this->config->channels))
-			$this->join($this->config->channels);
+		if(count($channels))
+			$this->joinChannel($channels);
 	}
 	public function login()
 	{
@@ -79,11 +83,11 @@ class fatelessBot {
 	{
 		$this->send('PRIVMSG '.$to.' :'.$msg);
 	}
-	private function join($channel)
+	private function joinChannel($channel)
 	{
 		if(is_array($channel))
 			foreach($channel as $chan)
-				$this->join($chan);
+				$this->joinChannel($chan);
 		else
 			$this->send('JOIN '. $channel);
 	}

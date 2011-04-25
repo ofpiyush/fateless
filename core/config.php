@@ -59,7 +59,7 @@ class config
 			}
 		}
 		else
-			self::$conf['channels'][]=$channel;
+			array_push(self::$conf['channels'],$channel);
 		unset($channels);
 	}
 }

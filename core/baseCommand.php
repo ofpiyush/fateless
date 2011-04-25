@@ -25,39 +25,8 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-final class fateless
+abstract class baseCommand
 {
-	private static $lazyPaths = array();
 	
-	private function __construct(){}
 	
-	public static function run()
-	{
-		require_once(FATELESS_BASEPATH.'config.php');
-		self::$lazyPaths = $lazyPaths;
-		spl_autoload_register(array(__CLASS__, 'autoload' ));
-		$bot = new fatelessBot(new config($config), new logger($config['logsDir']));
-		unset($config,$lazyPaths);
-	}
-	
-	public static function autoload($class)
-	{
-		if(class_exists($class))
-			return ;
-		foreach(self::$lazyPaths as $path)
-			if(file_exists($path.$class.'.php'))
-			{
-				require_once($path.$class.'.php');
-				return true;
-			}
-	}
-
-	public static function addLazyPath($path)
-	{
-		$path = rtrim(realpath($path),'/').'/';
-		if($path!='/')
-			self::$lazyPaths[]=$path;
-		unset($path);
-	}
-
 }

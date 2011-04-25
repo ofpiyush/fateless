@@ -25,3 +25,11 @@ if ( ! defined('FATELESS_BASEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
+class commandResolver
+{
+	function __construct($string)
+	{
+		
+	}
+	
+}
