@@ -39,18 +39,20 @@ final class fateless
 		spl_autoload_register(array(__CLASS__, 'autoload' ));
 		logger::setLogsDir($config['logsDir']);
 		self::$resolver	= new commandResolver();
-		self::$bot		= new fatelessBot(	new config($config)	);
+		self::$bot		= new fatelessBot(new config($config)	);
 		unset($config,$lazyPaths);
 		do{/* nothing*/}while(self::handleRequest());
 	}
 	public static function handleRequest()
 	{
+		$return= true;
 		$request = new request(self::$bot->read());
 		if(is_array($request->cmds) && count($request->cmds) > 0)
 		{
 			foreach($request->cmds as $command)
-				self::resolver->getCommand($command)->process($request, self::$bot);
+				$return = $return && self::resolver->getCommand($command)->process($request, self::$bot);
 		}
+		return $return;
 	}
 	public static function autoload($class)
 	{
