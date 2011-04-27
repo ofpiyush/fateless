@@ -41,7 +41,7 @@ $config = array
 $lazyPaths = array
 	(
 		FATELESS_ENGINEPATH.'core/',
-		FATELESS_BASEPATH.$config['commandsDir'],
+		FATELESS_BASEPATH.$config['commandsDir'].'/',
 		FATELESS_ENGINEPATH.'commands/'
 	);
 $admins = array();
