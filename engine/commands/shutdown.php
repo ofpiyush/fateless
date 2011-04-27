@@ -25,13 +25,23 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-class ping extends baseCommand
+class shutdown extends baseCommand
 {
-	private $context;
 	function execute(request $request, fatelessBot $bot)
 	{
-		$bot->write("PONG".$request->msg)
-		return true;
+		if($bot->isMaster($request->author['nick'],$request->author['user'])
+			|| $bot->isAdmin($request->author['nick'],$request->author['user']) ) 
+		{
+			$bot->write('QUIT :Help make fateless better http://github.com/piyushmishra/fateless');
+			fateless::$run = false;
+		}
+		else
+		{
+			if(!is_null($request->channel))
+				$bot->privmsg($request->channel,$request->author['nick'].' : '.$bot->config->authErrorMsg);
+			elseif(!is_null($request->author))
+				$bot->privmsg($request->author['nick'],$bot->config->authErrorMsg);
+		}
 	}
 
 }

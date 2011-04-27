@@ -29,35 +29,74 @@ class request
 {
 	var $author		= null;
 	var $channel	= null;
-	var $baseCmd	= null;
+	var $action		= null;
 	var $cmd		= null;
+	var $extra		= null;
 	var $msg		= null;
 	var $raw		= null;
 	function __construct($string)
 	{
-		$parts = explode(':',$string);
-		$this->raw['base'] = array_shift($parts);
-		if(is_array($parts))
-			$this->raw['msg'] = implode(':',$parts);
-		unset($string,$parts);
+		echo $string."\r\n";
+		$this->raw = $this->explode(':',$string,array('base','msg'));
 		$this->processBase();
-		if(array_key_exists('msg',$this->raw) && $this->baseCmd == 'PRIVMSG')
+		if(array_key_exists('msg',$this->raw) && in_array($this->action , array('privmsg','join','quit')))
 			$this->process($this->raw['msg']);
+	}
+	public function setAuthor($user)
+	{
+		if(array_key_exists('nick',$user) && array_key_exists('user',$user))
+			$this->author = $user;
 	}
 	public function process($msg)
 	{
-		$parts = explode(" ",$msg);
-		//if()
+		$parts = $this->explode(" ",$msg,array('command','message'));
+		if(array_key_exists('command',$parts) && $parts['command'][0] == '!')
+		{
+			$this->cmd = substr($parts['command'],1);
+			if(array_key_exists('message',$parts))
+				$this->msg = $parts['message'];
+		}
+		else
+			$this->msg = $msg;
+		unset($parts);
 	}
 	private function processBase()
 	{
-		$parts = explode(" ",$this->raw['base']);
-		if($parts[0] == "PING")
+		$parts = $this->explode(" ",$this->raw['base'],array('sender','action','receiver','extra'));
+		if($parts['sender'] == "PING")
 		{
-			$this->cmd = 'ping';
+			$this->action = "ping";
 			return ;
 		}
-		$sender = array_shift($parts);
+		$user = $this->explode('!',$parts['sender'],array('nick','user'));
+		if(array_key_exists('nick',$user)
+			&& array_key_exists('user',$user)
+			&& substr($user['nick'],-12) != "freenode.net")
+		{
+			$this->author = $user;
+			$this->action = strtolower($parts['action']);
+			if(array_key_exists('receiver',$parts) && $parts['receiver'][0] == '#')
+				$this->channel = $parts['receiver'];
+			if(array_key_exists('extra',$parts))
+				$this->extra = $parts['extra'];
+			unset($parts,$user);
+		}
 		
+	}
+	
+	private function explode($exploder,$string,$keys)
+	{
+		$parts	= explode($exploder,$string);
+		$return	= array();
+		$last	= array_pop($keys);
+		foreach($keys as $key)
+		{
+			if(is_array($parts))
+				$return[$key] = array_shift($parts);
+		}
+		if(is_array($parts))
+			$return[$last] = implode($exploder,$parts);
+		unset($parts,$last);
+		return $return;
 	}
 }

@@ -25,24 +25,15 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-$config = array
-	( 
-		'server'		=> 'chat.freenode.net',
-		'port'			=> 6667,
-		'channels'		=> array(),
-		'name'			=> '',
-		'nick'			=> '',
-		'pass'			=> null,
-		'readLength'	=> 512,
-		'logsDir'		=> 'logs',
-		'commandsDir'	=> 'commands',
-		'authErrorMsg'	=> 'I am sorry I cannot identify you.'
-	);
-$lazyPaths = array
-	(
-		FATELESS_ENGINEPATH.'core/',
-		FATELESS_BASEPATH.$config['commandsDir'],
-		FATELESS_ENGINEPATH.'commands/'
-	);
-$admins = array();
-$masters = array();
+class newchan extends baseCommand
+{
+	function execute(request $request, fatelessBot $bot)
+	{
+		$channel = explode(" ",$request->msg);
+		if($channel[0][0]=='#')
+			$bot->joinChannel($channel[0]);
+		self::$log->line('Joined channel',$channel[0]);
+		unset($channel);
+	}
+
+}

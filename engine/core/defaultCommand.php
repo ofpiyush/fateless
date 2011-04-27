@@ -28,10 +28,19 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 class defaultCommand extends baseCommand
 {
 	private $context;
+	private static $callbacks = array();
 	function execute(request $request, fatelessBot $bot)
 	{
-		//Do nothing
-		return true;
+			$this->call($request,$bot);
 	}
-
+	function addCallback($callback)
+	{
+		if(is_callable($callback))
+			self::$callbacks[] = $callback;
+	}
+	private function call(request $request , fatelessBot $bot)
+	{
+		foreach (self::$callbacks as $callback)
+			call_user_func($callback,$request,$bot);
+	} 
 }

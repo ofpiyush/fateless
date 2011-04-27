@@ -25,24 +25,12 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-$config = array
-	( 
-		'server'		=> 'chat.freenode.net',
-		'port'			=> 6667,
-		'channels'		=> array(),
-		'name'			=> '',
-		'nick'			=> '',
-		'pass'			=> null,
-		'readLength'	=> 512,
-		'logsDir'		=> 'logs',
-		'commandsDir'	=> 'commands',
-		'authErrorMsg'	=> 'I am sorry I cannot identify you.'
-	);
-$lazyPaths = array
-	(
-		FATELESS_ENGINEPATH.'core/',
-		FATELESS_BASEPATH.$config['commandsDir'],
-		FATELESS_ENGINEPATH.'commands/'
-	);
-$admins = array();
-$masters = array();
+class ping extends baseCommand
+{
+	function execute(request $request, fatelessBot $bot)
+	{
+		$bot->write("PONG".$request->msg);
+		return true;
+	}
+
+}

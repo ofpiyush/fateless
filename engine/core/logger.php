@@ -27,13 +27,13 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 class logger
 {
-	private static $dir = null;
+	private static $dir	= null;
 	function __construct()
 	{
 		if(self::$dir == '/')
 			throw new Exception("Logs directory not present");
 	}
-	public static setLogsDir($dir)
+	public static function setLogsDir($dir)
 	{
 		if(is_null(self::$dir))
 			self::$dir = rtrim(realpath(FATELESS_BASEPATH.$dir),'/').'/';
@@ -42,10 +42,12 @@ class logger
 	{
 		$this->line($msg,'errors');
 	}
-	function line($msg, $where ='general')
+	function line($msg, $where ='default.txt')
 	{
+		if(! strlen($where))
+			$where='default.txt';
 		$fp = fopen(self::$dir.$where,'a');
-		fwrite('[ '.microtime(true).'] '.$msg."\r\n",$fp);
+		fwrite($fp,'[ '.date('r').'] '.$msg."\r\n");
 		fclose($fp);
 		unset($fp);
 	}

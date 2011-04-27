@@ -37,6 +37,8 @@ class commandResolver
 	}
 	function getCommand($classname)
 	{
+		if(is_null($classname))
+			return $this->defaultCmd;
 		if(array_key_exists($classname,$this->instances))
 			return $this->instances[$classname];
 		if(fateless::autoload($classname))
@@ -50,13 +52,7 @@ class commandResolver
 					return $this->instances[$classname];
 				}
 			}
-			else
-			{
-				
-			}
 		}
-		elseif()
-			
 		else
 			return $this->defaultCmd;
 	}

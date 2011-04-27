@@ -27,44 +27,86 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 final class fateless
 {
+	public static $run = true;
 	private static $lazyPaths = array();
 	private static $resolver;
 	private static $bot;
+	private static $config;
+	private static $log;
+	private static $actions;
+
 	private function __construct(){}
 	
 	public static function run()
 	{
 		require_once(FATELESS_BASEPATH.'config.php');
-		self::$lazyPaths = $lazyPaths;
+		self::$lazyPaths	= $lazyPaths;
 		spl_autoload_register(array(__CLASS__, 'autoload' ));
-		logger::setLogsDir($config['logsDir']);
-		self::$resolver	= new commandResolver();
-		self::$bot		= new fatelessBot(new config($config)	);
+		$config['actions']	= self:: $actions = array('join','part','ping','quit','mode');
+		self::$config		= new config($config);
+		self::$resolver		= new commandResolver();
+		self::$bot			= new fatelessBot(self::$config);
+		logger::setLogsDir(self::$config->logsDir);
+		self::$log			= new logger();
+		if(is_array($admins) && count($admins) > 0)
+			foreach($admins as $admin)
+				self::$bot->addAdmin($admin['nick'],$admin['user']);
+		if(is_array($admins) && count($admins) > 0)
+			foreach($admins as $admin)
+				self::$bot->addAdmin($admin['nick'],$admin['user']);
+		
 		unset($config,$lazyPaths);
-		do{/* nothing*/}while(self::handleRequest());
+		do{
+			self::handleRequest();
+		}while(self::$run);
 	}
 	public static function handleRequest()
 	{
 		$request = new request(self::$bot->read());
-		if(!is_null($request->cmd))
+		if( $request->action == 'privmsg'
+			&& !is_null($request->cmd)
+			&& !in_array($request->cmd,self::$actions) )
 		{
-			return self::resolver->getCommand($request->cmd)->process($request, self::$bot);
+			self::$resolver->getCommand($request->cmd)->execute($request, self::$bot);
 		}
-		return true;
+		elseif(!is_null($request->action) && in_array($request->action,self::$actions))
+		{
+			if(self::checkRequire($request->action,FATELESS_ENGINEPATH.'actions/'))
+				self::$resolver->getCommand($request->action)->execute($request, self::$bot);
+		}
+		self::log($request);
+		unset($request);
+		flush();
+	}
+	public static function log($request)
+	{
+		if(!is_null($request->channel))
+			self::$log->line($request->author['nick'].':'.$request->raw['msg'], $request->channel);
+		elseif(!is_null($request->author)
+			&& array_key_exists('user',$request->author)
+			&& !in_array($request->author['nick'],array('NickServ',self::$config->nick)))
+			self::$log->line($request->author['nick'].':'.$request->raw['msg'], $request->author['nick']);
+		else
+			self::$log->line($request->raw['msg']);
 	}
 	public static function autoload($class)
 	{
 		if(class_exists($class))
 			return true;
 		foreach(self::$lazyPaths as $path)
-			if(file_exists($path.$class.'.php'))
+			if(self::checkRequire($class,$path))
+				return true;
+		return false;
+	}
+	public static function checkRequire($class,$path)
+	{
+		if(file_exists($path.$class.'.php'))
 			{
 				require_once($path.$class.'.php');
 				return true;
 			}
-		return false;
+			return false;
 	}
-
 	public static function addLazyPath($path)
 	{
 		$path = rtrim(realpath($path),'/').'/';

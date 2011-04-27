@@ -27,6 +27,12 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 abstract class baseCommand
 {
-	final function __construct(){}
+	protected static $log = null;
+	final function __construct()
+	{
+		if(is_null(self::$log))
+			self::$log = new logger();
+	}
+
 	abstract function execute(request $request, fatelessBot $bot);
 }

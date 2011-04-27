@@ -26,15 +26,11 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  * @copyright 2010-2011 Piyush Mishra
  */
 class fatelessBot {
-	private $socket;
-	private $config;
-	private $logger;
-	private $resolver;
-	private $commands	= array();
-	private $actions	= array();
+	public $config;
+	private static $socket;
 	private $masters	= array();
 	private $admins	= array();
-	public function __construct($config)
+	public function __construct(config $config)
 	{
 		$this->config	= $config;
 		$this->connect();
@@ -43,8 +39,8 @@ class fatelessBot {
 	}
 	public function read()
 	{
-		$read = fgets($this->socket, $this->config->readLength);
-		return ltrim($read,':');
+		$read = fgets(self::$socket, $this->config->readLength);
+		return str_replace(array(chr(10), chr(13)), '', ltrim($read,':'));
 	}
 	public function write($cmd)
 	{
@@ -52,7 +48,7 @@ class fatelessBot {
 	}
 	public function connect()
 	{
-		$this->socket = fsockopen($this->config->server, $this->config->port);
+		self::$socket = fsockopen($this->config->server, $this->config->port);
 		$this->send(
 			'USER '. $this->config->nick.' piyushmishra.com '.
 			$this->config->nick.' : '.$this->config->name
@@ -61,7 +57,7 @@ class fatelessBot {
 	}
 	public function disconect()
 	{
-		fclose($this->socket);
+		fclose(self::$socket);
 	}
 	public function login()
 	{
@@ -85,11 +81,11 @@ class fatelessBot {
 	}
 	public function isAdmin($nick,$user)
 	{
-		$this->isUser($nick,$user,'admins')
+		return $this->isUser($nick,$user,'admins');
 	}
 	public function isMaster($nick,$user)
 	{
-		$this->isUser($nick,$user,'masters')
+		return $this->isUser($nick,$user,'masters');
 	}
 	public function privmsg($to, $msg)
 	{
@@ -97,18 +93,18 @@ class fatelessBot {
 	}
 	private function joinChannels($channels)
 	{
-		if(is_array($channel))
-			foreach($channel as $chan)
+		if(is_array($channels))
+			foreach($channels as $chan)
 				$this->joinChannel($chan);
 		elseif(strlen($channels))
 			$this->joinChannel($channels);
 	}
 	private function isUser($nick,$user,$type)
 	{
-		return (array_key_exists($nick,$this->$type) && $this->$type[$nick] == $user);
+		return (array_key_exists($nick,$this->$type) && $this->{$type}[$nick] == $user);
 	}
-	private function send($cmd) 
+	private function send($cmd)
 	{
-		fputs($this->socket, $cmd."\r\n");
+		fputs(self::$socket, $cmd."\r\n");
 	}
 }
