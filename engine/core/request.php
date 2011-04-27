@@ -52,13 +52,12 @@ class request
 	private function processBase()
 	{
 		$parts = explode(" ",$this->raw['base']);
-		if($parts[0] = "PING")
+		if($parts[0] == "PING")
 		{
 			$this->cmd = 'ping';
 			return ;
 		}
 		$sender = array_shift($parts);
-		
 		
 	}
 }
