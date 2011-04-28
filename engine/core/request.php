@@ -36,7 +36,6 @@ class request
 	var $raw		= null;
 	function __construct($string)
 	{
-		echo $string."\r\n";
 		$this->raw = $this->explode(':',$string,array('base','msg'));
 		$this->processBase();
 		if(array_key_exists('msg',$this->raw) && in_array($this->action , array('privmsg','join','quit')))
@@ -59,6 +58,21 @@ class request
 		else
 			$this->msg = $msg;
 		unset($parts);
+	}
+	public function explode($exploder,$string,$keys)
+	{
+		$parts	= explode($exploder,$string);
+		$return	= array();
+		$last	= array_pop($keys);
+		foreach($keys as $key)
+		{
+			if(is_array($parts))
+				$return[$key] = array_shift($parts);
+		}
+		if(is_array($parts))
+			$return[$last] = implode($exploder,$parts);
+		unset($parts,$last);
+		return $return;
 	}
 	private function processBase()
 	{
@@ -84,19 +98,5 @@ class request
 		
 	}
 	
-	private function explode($exploder,$string,$keys)
-	{
-		$parts	= explode($exploder,$string);
-		$return	= array();
-		$last	= array_pop($keys);
-		foreach($keys as $key)
-		{
-			if(is_array($parts))
-				$return[$key] = array_shift($parts);
-		}
-		if(is_array($parts))
-			$return[$last] = implode($exploder,$parts);
-		unset($parts,$last);
-		return $return;
-	}
+
 }

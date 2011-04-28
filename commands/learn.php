@@ -30,25 +30,33 @@ class learn extends baseCommand
 	public static $ran		= null;
 	public static $terms	= array();
 	public static $file	= null;
-	function execute(request $request, fatelessBot $bot)
+	function execute(request $request)
 	{
 		if(is_null(self::$ran))
-			$this->setup($bot->config->cacheDir);
+			$this->setup(self::$bot->config->cacheDir);
 		if(!is_null($request->msg))
-			$this->saveCache(utf8_encode($request->cmd),utf8_encode($request->msg));
+		{
+			$term = $request->explode(' ',utf8_encode($request->msg),array('term','msg'));
+			if(array_key_exists('term',$term)
+				&& array_key_exists('msg',$term)
+				&& strlen(trim($term['msg'])) > 0)
+			{
+				self::$terms[$term['term']] = trim($term['msg']);
+				$this->saveCache();
+				self::reply($request,'/me is getting wiser',false);
+			}
+			else
+				self::reply($request,'thats gibberish!');
+		}
 	}
-	public function callback(request $request,fatelessBot $bot)
+	public static function callback(request $request)
 	{
 		$cmd = utf8_encode($request->cmd);
 		if(array_key_exists($cmd,self::$terms))
-			if(!is_null($request->channel))
-				$bot->privmsg($request->channel,$request->author['nick'].' :'.self::$terms[$cmd]);
-			elseif(!is_null($request->author) && array_key_exists('nick',$request->author))
-				$bot->privmsg($request->author['nick'],self::$terms[$cmd]);
+			self::reply($request,self::$terms[$cmd]);
 	}
-	public function saveCache($term,$msg)
+	public function saveCache()
 	{
-		self::$terms[$term] = $msg;
 		$fp = fopen(self::$file,"w");
 		fwrite($fp,serialize(self::$terms));
 		fclose($fp);
@@ -56,7 +64,8 @@ class learn extends baseCommand
 	}
 	public function loadCache()
 	{
-		self::$terms = unserialize(file_get_contents(self::$file)); 
+		if(file_exists(self::$file))
+			self::$terms = unserialize(file_get_contents(self::$file)); 
 	}
 	private function setup($dir)
 	{

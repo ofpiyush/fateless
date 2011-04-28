@@ -28,11 +28,32 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
 abstract class baseCommand
 {
 	protected static $log = null;
+	protected static $bot = null;
 	final function __construct()
 	{
 		if(is_null(self::$log))
 			self::$log = new logger();
 	}
-
-	abstract function execute(request $request, fatelessBot $bot);
+	protected static function reply(request $request ,$message, $toAuthor = true )
+	{
+		$to = null;
+		if(!is_null($request->channel))
+		{
+			$message	= (($toAuthor)? $request->author['nick'].': ' : '' ).$message;
+			$to			= $request->channel;
+		}
+		elseif(!is_null($request->author))
+			$to = $request->author['nick'];
+		if(!is_null($to))
+		{
+			self::$bot->privmsg($to,$message);
+			self::$log->line(self::$bot->config->nick.':'.$message, $to);
+		}
+	}
+	public static function addBot(fatelessBot $bot)
+	{
+		if(is_null(self::$bot))
+			self::$bot = $bot;
+	}
+	abstract function execute(request $request);
 }

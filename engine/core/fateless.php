@@ -47,6 +47,7 @@ final class fateless
 		self::$resolver		= new commandResolver();
 		self::$bot			= new fatelessBot(self::$config);
 		logger::setLogsDir(self::$config->logsDir);
+		baseCommand::addBot(self::$bot);
 		self::$log			= new logger();
 		if(is_array($admins) && count($admins) > 0)
 			foreach($admins as $admin)
@@ -63,18 +64,18 @@ final class fateless
 	public static function handleRequest()
 	{
 		$request = new request(self::$bot->read());
+		self::log($request);
 		if( $request->action == 'privmsg'
 			&& !is_null($request->cmd)
 			&& !in_array($request->cmd,self::$actions) )
 		{
-			self::$resolver->getCommand($request->cmd)->execute($request, self::$bot);
+			self::$resolver->getCommand($request->cmd)->execute($request);
 		}
 		elseif(!is_null($request->action) && in_array($request->action,self::$actions))
 		{
 			if(self::checkRequire($request->action,FATELESS_ENGINEPATH.'actions/'))
-				self::$resolver->getCommand($request->action)->execute($request, self::$bot);
+				self::$resolver->getCommand($request->action)->execute($request);
 		}
-		self::log($request);
 		unset($request);
 		flush();
 	}

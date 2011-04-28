@@ -25,15 +25,24 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2010-2011 Piyush Mishra
  */
-class newchan extends baseCommand
+class unlearn extends learn
 {
 	function execute(request $request)
 	{
-		$channel = explode(" ",$request->msg);
-		if($channel[0][0]=='#')
-			self::$bot->joinChannel($channel[0]);
-		self::$log->line('Joined channel',$channel[0]);
-		unset($channel);
+		if(is_null(self::$ran))
+			$this->setup(self::$bot->config->cacheDir);
+		if(!is_null($request->msg))
+		{
+			$term = $request->explode(' ',utf8_encode($request->msg),array('term','msg'));
+			if(array_key_exists('term',$term)
+				&& array_key_exists($term['term'],self::$terms))
+			{
+				unset(self::$terms[$term['term']]);
+				$this->saveCache();
+				self::reply($request,'/me is getting noober',false);
+			}
+			else
+				self::reply($request,'lol teach me that before making me forget it');
+		}
 	}
-
 }

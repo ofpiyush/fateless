@@ -27,20 +27,19 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 class shutdown extends baseCommand
 {
-	function execute(request $request, fatelessBot $bot)
+	function execute(request $request)
 	{
-		if($bot->isMaster($request->author['nick'],$request->author['user'])
-			|| $bot->isAdmin($request->author['nick'],$request->author['user']) ) 
+		if(self::$bot->isMaster($request->author['nick'],$request->author['user'])
+			|| self::$bot->isAdmin($request->author['nick'],$request->author['user']) ) 
 		{
-			$bot->write('QUIT :Help make fateless better http://github.com/piyushmishra/fateless');
+			self::$log->line("Quit sent by ".$request->author['nick']);
+			self::reply($request,"Bye Bye! :)");
+			self::$bot->write('QUIT :Help make fateless better http://github.com/piyushmishra/fateless ');
 			fateless::$run = false;
 		}
 		else
 		{
-			if(!is_null($request->channel))
-				$bot->privmsg($request->channel,$request->author['nick'].' : '.$bot->config->authErrorMsg);
-			elseif(!is_null($request->author))
-				$bot->privmsg($request->author['nick'],$bot->config->authErrorMsg);
+			self::reply($request,$bot->config->authErrorMsg);
 		}
 	}
 

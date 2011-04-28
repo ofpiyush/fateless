@@ -27,9 +27,9 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 class ping extends baseCommand
 {
-	function execute(request $request, fatelessBot $bot)
+	function execute(request $request)
 	{
-		$bot->write("PONG".$request->msg);
+		self::$bot->write("PONG".$request->msg);
 		return true;
 	}
 

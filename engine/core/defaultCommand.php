@@ -29,18 +29,18 @@ class defaultCommand extends baseCommand
 {
 	private $context;
 	private static $callbacks = array();
-	function execute(request $request, fatelessBot $bot)
+	function execute(request $request)
 	{
-			$this->call($request,$bot);
+		$this->call($request);
 	}
 	function addCallback($callback)
 	{
 		if(is_callable($callback))
 			self::$callbacks[] = $callback;
 	}
-	private function call(request $request , fatelessBot $bot)
+	private function call(request $request)
 	{
 		foreach (self::$callbacks as $callback)
-			call_user_func($callback,$request,$bot);
+			call_user_func($callback,$request);
 	} 
 }
