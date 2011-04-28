@@ -27,13 +27,43 @@ if ( ! defined('FATELESS_ENGINEPATH')) exit('No direct script access allowed');
  */
 class learn extends baseCommand
 {
+	public static $ran		= null;
+	public static $terms	= array();
+	public static $file	= null;
 	function execute(request $request, fatelessBot $bot)
 	{
-		
+		if(is_null(self::$ran))
+			$this->setup($bot->config->cacheDir);
+		if(!is_null($request->msg))
+			$this->saveCache(utf8_encode($request->cmd),utf8_encode($request->msg));
 	}
-	public static function callback(request $request,fatelessBot $bot)
+	public function callback(request $request,fatelessBot $bot)
 	{
-		
+		$cmd = utf8_encode($request->cmd);
+		if(array_key_exists($cmd,self::$terms))
+			if(!is_null($request->channel))
+				$bot->privmsg($request->channel,$request->author['nick'].' :'.self::$terms[$cmd]);
+			elseif(!is_null($request->author) && array_key_exists('nick',$request->author))
+				$bot->privmsg($request->author['nick'],self::$terms[$cmd]);
 	}
-
+	public function saveCache($term,$msg)
+	{
+		self::$terms[$term] = $msg;
+		$fp = fopen(self::$file,"w");
+		fwrite($fp,serialize(self::$terms));
+		fclose($fp);
+		unset($fp);
+	}
+	public function loadCache()
+	{
+		self::$terms = unserialize(file_get_contents(self::$file)); 
+	}
+	private function setup($dir)
+	{
+		$cmd = new defaultCommand();
+		$cmd->addCallback(array($this,'callback'));
+		self::$ran	= true;
+		self::$file	= FATELESS_BASEPATH.$dir.'/learncache.txt';
+		$this->loadCache();
+	}
 }
